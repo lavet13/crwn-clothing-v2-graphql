@@ -6,10 +6,12 @@ import ProductCard from '../../components/product-card/product-card.component';
 import { CategoriesContext } from '../../contexts/categories.context';
 
 import { CategoryContainer, Title } from './category.styles';
+import Spinner from '../../components/spinner/spinner.component';
 
 const Category = () => {
   const { category } = useParams();
-  const { categoriesMap } = useContext(CategoriesContext);
+  const { categoriesMap, loading, error, isPolling } =
+    useContext(CategoriesContext);
   const [products, setProducts] = useState(categoriesMap[category]);
 
   useEffect(() => {
@@ -18,13 +20,21 @@ const Category = () => {
 
   return (
     <Fragment>
-      <Title>{category.toUpperCase()}</Title>
-      <CategoryContainer>
-        {products &&
-          products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-      </CategoryContainer>
+      {loading && !isPolling ? (
+        <Spinner />
+      ) : error ? (
+        <h1>Some kind of error{error.message}</h1>
+      ) : (
+        <Fragment>
+          <Title>{category.toUpperCase()}</Title>
+          <CategoryContainer>
+            {products &&
+              products.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+          </CategoryContainer>
+        </Fragment>
+      )}
     </Fragment>
   );
 };

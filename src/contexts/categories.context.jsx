@@ -1,11 +1,16 @@
-import { createContext } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { createContext, useEffect, useState } from 'react';
+import { useQuery, gql, NetworkStatus, useLazyQuery } from '@apollo/client';
 
 export const CategoriesContext = createContext({
   categoriesMap: {},
+  loading: false,
+  error: null,
+  isPolling: false,
+  getCollections: () => undefined,
+  refetch: () => undefined,
 });
 
-const COLLECTIONS = gql`
+export const COLLECTIONS = gql`
   query {
     collections {
       id
@@ -21,12 +26,38 @@ const COLLECTIONS = gql`
 `;
 
 export const CategoriesProvider = ({ children }) => {
-  const { loading, error, data } = useQuery(COLLECTIONS);
+  const [getCollections, { loading, error, data, networkStatus, refetch }] =
+    useLazyQuery(COLLECTIONS, {
+      notifyOnNetworkStatusChange: true,
+      pollInterval: 10000,
+    });
 
-  console.log(loading);
-  console.log(data);
+  const [categoriesMap, setCategoriesMap] = useState({});
+  const isPolling = networkStatus === NetworkStatus.poll;
+  console.log('isPolling', isPolling);
+  console.log(networkStatus);
 
-  const value = { categoriesMap: {} };
+  useEffect(() => {
+    if (data) {
+      const { collections } = data;
+      const collectionsMap = collections.reduce((acc, collection) => {
+        // return { ...acc, [collection.title]: collection.items };
+        acc[collection.title?.toLowerCase()] = collection.items;
+        return acc;
+      }, {});
+
+      setCategoriesMap(collectionsMap);
+    }
+  }, [data]);
+
+  const value = {
+    categoriesMap,
+    loading,
+    error,
+    isPolling,
+    getCollections,
+    refetch,
+  };
 
   return (
     <CategoriesContext.Provider value={value}>
