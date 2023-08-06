@@ -13,6 +13,12 @@ import './index.scss';
 const client = new ApolloClient({
   uri: 'https://crwn-clothing.com/',
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'network-only', // always executes the query against graphql server, used for first execution
+      nextFetchPolicy: 'cache-first', // future responds to queries, used for subsequent executions
+    },
+  },
 });
 
 const rootElement = document.getElementById('root');

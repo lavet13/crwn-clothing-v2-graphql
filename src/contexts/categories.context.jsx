@@ -1,12 +1,11 @@
 import { createContext, useEffect, useState } from 'react';
-import { useQuery, gql, NetworkStatus, useLazyQuery } from '@apollo/client';
+import { useQuery, gql, NetworkStatus } from '@apollo/client';
 
 export const CategoriesContext = createContext({
   categoriesMap: {},
   loading: false,
   error: null,
   isPolling: false,
-  getCollections: () => undefined,
   refetch: () => undefined,
 });
 
@@ -26,16 +25,20 @@ export const COLLECTIONS = gql`
 `;
 
 export const CategoriesProvider = ({ children }) => {
-  const [getCollections, { loading, error, data, networkStatus, refetch }] =
-    useLazyQuery(COLLECTIONS, {
+  const { loading, error, data, networkStatus, refetch } = useQuery(
+    COLLECTIONS,
+    {
       notifyOnNetworkStatusChange: true,
       pollInterval: 10000,
-    });
+    }
+  );
 
   const [categoriesMap, setCategoriesMap] = useState({});
   const isPolling = networkStatus === NetworkStatus.poll;
+  const isRefetching = networkStatus === NetworkStatus.refetch;
   console.log('isPolling', isPolling);
-  console.log(networkStatus);
+  console.log('isRefetching', isRefetching);
+  console.log('networkStatus', networkStatus);
 
   useEffect(() => {
     if (data) {
@@ -55,7 +58,6 @@ export const CategoriesProvider = ({ children }) => {
     loading,
     error,
     isPolling,
-    getCollections,
     refetch,
   };
 

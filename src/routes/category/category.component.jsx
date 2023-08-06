@@ -12,6 +12,7 @@ const Category = () => {
   const { category } = useParams();
   const { categoriesMap, loading, error, isPolling } =
     useContext(CategoriesContext);
+
   const [products, setProducts] = useState(categoriesMap[category]);
 
   useEffect(() => {
