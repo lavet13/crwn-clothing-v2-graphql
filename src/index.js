@@ -15,8 +15,10 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'network-only', // always executes the query against graphql server, used for first execution
-      nextFetchPolicy: 'cache-first', // future responds to queries, used for subsequent executions
+      // pollInterval: 15000,
+      notifyOnNetworkStatusChange: true,
+      // fetchPolicy: 'network-only', // always executes the query against graphql server, used for first execution
+      // nextFetchPolicy: 'cache-first', // future responds to queries, used for subsequent executions
     },
   },
 });

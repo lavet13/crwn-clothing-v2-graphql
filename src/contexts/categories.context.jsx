@@ -25,23 +25,18 @@ export const COLLECTIONS = gql`
 `;
 
 export const CategoriesProvider = ({ children }) => {
-  const { loading, error, data, networkStatus, refetch } = useQuery(
-    COLLECTIONS,
-    {
-      notifyOnNetworkStatusChange: true,
-      pollInterval: 10000,
-    }
-  );
+  const { loading, error, data, networkStatus, refetch } =
+    useQuery(COLLECTIONS);
 
   const [categoriesMap, setCategoriesMap] = useState({});
   const isPolling = networkStatus === NetworkStatus.poll;
   const isRefetching = networkStatus === NetworkStatus.refetch;
-  console.log('isPolling', isPolling);
-  console.log('isRefetching', isRefetching);
+
   console.log('networkStatus', networkStatus);
 
   useEffect(() => {
     if (data) {
+      console.log(data);
       const { collections } = data;
       const collectionsMap = collections.reduce((acc, collection) => {
         // return { ...acc, [collection.title]: collection.items };
